@@ -10,6 +10,8 @@ import javax.inject.Inject;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.eclipse.microprofile.reactive.messaging.OnOverflow;
+import org.eclipse.microprofile.reactive.messaging.OnOverflow.Strategy;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -29,7 +31,9 @@ import io.quarkus.arc.Arc;
 public class PeriodicTask {
 
     @Inject
-    @Channel("new-question") Emitter<String> questions;
+    @Channel("new-question")
+    @OnOverflow(value = Strategy.DROP)
+    Emitter<String> questions;
 
     @Inject
     Scheduler quartz;
