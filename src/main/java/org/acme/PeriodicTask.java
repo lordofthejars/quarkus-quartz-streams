@@ -32,7 +32,6 @@ public class PeriodicTask {
 
     @Inject
     @Channel("new-question")
-    @OnOverflow(value = Strategy.DROP)
     Emitter<String> questions;
 
     @Inject
@@ -48,8 +47,8 @@ public class PeriodicTask {
                                         .startNow()
                                         .withSchedule(
                                             SimpleScheduleBuilder.simpleSchedule()
-                                                .withIntervalInSeconds(20)
-                                                .withRepeatCount(4))
+                                                .withIntervalInSeconds(10)
+                                                .withRepeatCount(3))
                                         .build();
 
         quartz.getListenerManager()
@@ -85,7 +84,10 @@ public class PeriodicTask {
             Trigger trigger,
             JobExecutionContext context,
             CompletedExecutionInstruction triggerInstructionCode) {
-                System.out.println("Completed Trigger " + triggerInstructionCode.name());
+                if (triggerInstructionCode == CompletedExecutionInstruction.DELETE_TRIGGER) {
+                    System.out.println("End");
+                    Arc.container().instance(PeriodicTask.class).get().send("That's all folks");
+                }
         }
 
     }
